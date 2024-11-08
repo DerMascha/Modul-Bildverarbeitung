@@ -11,22 +11,43 @@ def create_bounding_boxes(labels):
         and w, h are the width and height of the bounding box.'''
     results = []
     for i in np.unique(labels):
+        if i == 0:
+            continue
         index_y, index_x = np.where(labels == i)
         lmin = np.min(index_x)
         lmax = np.max(index_x)
         rmin = np.min(index_y)
         rmax = np.max(index_y)
+        # ignore all zero area bounding boxes
+        if lmin == lmax or rmin == rmax:
+            continue
         results.append((lmin, rmin, lmax-lmin, rmax-rmin))
     return results
 
-def draw_bounding_boxes(rectangles : list[(int, int, int, int)]):
+def draw_bounding_boxes(rectangles : list[(int, int, int, int)], labels :list[str] = None):
+    '''Draw bounding boxes on the current plot.
+    Args:
+        rectangles: a list of tuples (x, y, w, h) where x, y are the coordinates of the top-left corner of the bounding box
+        and w, h are the width and height of the bounding box.
+        labels: a list of strings to label each bounding box.
+        '''
+    for i, rect in enumerate(rectangles):
+        x, y, w, h = rect
+        box = plt.Rectangle((x, y), w, h, fill=False, edgecolor='red', linewidth=2)
+        # add text to the rectangle containing the label
+        if labels is not None:
+            plt.text(x, y - 2, labels[i], color='red')
+        plt.gca().add_patch(box)
+
+def draw_bounding_boxes_with_score(rects_with_score: dict[(int,int,int,int), float]):
     '''Draw bounding boxes on the current plot.
     Args:
         rectangles: a list of tuples (x, y, w, h) where x, y are the coordinates of the top-left corner of the bounding box
         and w, h are the width and height of the bounding box.'''
-    for rect in rectangles:
+    for rect, score in rects_with_score.items():
         x, y, w, h = rect
-        box = plt.Rectangle((x, y), w, h, fill=False, edgecolor='red', linewidth=2)
+        c = (1. - score, score, 0.)
+        box = plt.Rectangle((x, y), w, h, fill=False, edgecolor=c, linewidth=2)
         plt.gca().add_patch(box)
 
 def non_maximum_suppression(rects_with_score: dict[(int,int,int,int), float], overlap_threshold: float) -> list:
