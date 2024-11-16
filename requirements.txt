@@ -5,4 +5,4 @@ imageio-ffmpeg
 matplotlib
 ipywidgets
 ipympl
-skicit-image
+scikit-image
