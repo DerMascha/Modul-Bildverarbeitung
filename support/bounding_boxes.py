@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from support.iou import iou
 
-def create_bounding_boxes(labels):
+def create_bounding_boxes(labels, square = False):
     '''Create bounding boxes from a labeled image.
     Args:
         labels: a 2D numpy array with labels.
@@ -21,6 +21,12 @@ def create_bounding_boxes(labels):
         # ignore all zero area bounding boxes
         if lmin == lmax or rmin == rmax:
             continue
+        if square:
+            size = max(lmax-lmin, rmax-rmin)
+            lmin = max(0, lmin - (size - (lmax-lmin)) // 2)
+            lmax = min(labels.shape[1], lmax + (size - (lmax-lmin)) // 2)
+            rmin = max(0, rmin - (size - (rmax-rmin)) // 2)
+            rmax = min(labels.shape[0], rmax + (size - (rmax-rmin)) // 2)
         results.append((lmin, rmin, lmax-lmin, rmax-rmin))
     return results
 

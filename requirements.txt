@@ -6,3 +6,4 @@ matplotlib
 ipywidgets
 ipympl
 scikit-image
+tensorflow
